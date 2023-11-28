@@ -9,7 +9,6 @@ COPY requirements/ requirements/
 
 RUN pip install --upgrade pip \
         && pip install -r requirements/production.txt \
-        && rm -rf requirements
 
 COPY . .
 
