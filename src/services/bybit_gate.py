@@ -37,10 +37,10 @@ class BybitGate:
 
     def set_keys(self, tg_user_id: int, public_key: str, private_key: str):
         self._keys[tg_user_id] = KeyPair(public=public_key, private=private_key)
-        # self._exchanges[tg_user_id] = ccxt.bybit({
-        #         'apiKey': self._keys[tg_user_id].public,
-        #         'secret': self._keys[tg_user_id].private,
-        #     })
+        self._exchanges[tg_user_id] = ccxt.bybit({
+                'apiKey': self._keys[tg_user_id].public,
+                'secret': self._keys[tg_user_id].private,
+            })
 
     def check_connection(self, tg_user_id: int):
         exc = self._get_exc(tg_user_id)
