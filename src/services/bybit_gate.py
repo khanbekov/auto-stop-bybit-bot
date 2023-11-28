@@ -56,11 +56,12 @@ class BybitGate:
         positions = self.get_current_positions(tg_user_id)
         result = {}
         for position in positions:
+            pnl = position.get("unrealizedPnl", 0)
             result[position["symbol"]] = {
                 "symbol": position["symbol"],
                 "contracts": position["contracts"],
-                "pnl": position["unrealizedPnl"],
-                "roi": position["unrealizedPnl"] / position["initialMargin"] * 100,
+                "pnl": pnl,
+                "roi": pnl / position["notional"] * 100,
                 "side": position["side"]
             }
         return result
