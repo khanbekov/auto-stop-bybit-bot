@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import signal
 from typing import NoReturn
 
 from aiogram import Bot, Dispatcher
@@ -45,6 +46,8 @@ async def main():
     dp.include_router(couples_management.router)
 
     stops_handler = StopsHandler(db=db, bot=bot, dispatcher=dp, exchange_gate=exc)
+
+    signal.signal(signal.SIGINT, stops_handler.stop_checking_loop)
 
     await setup_bot_commands(bot)
 

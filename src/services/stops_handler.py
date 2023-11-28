@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class StopsHandler:
+    activated = True
 
     def __init__(self, db: DBFacade, bot: Bot, dispatcher: Dispatcher, exchange_gate: BybitGate):
         self.db = db
@@ -49,11 +50,15 @@ class StopsHandler:
                             await self.send_realized_stops_message(couple, roi_sum)
                             self.db.remove_couple(tg_user_id=tg_user_id, couple_id=couple_id)
 
+    def stop_checking_loop(self):
+        self.activated = False
+
     async def enter_to_checking_loop(self) -> NoReturn:
-        while True:
+        while self.activated:
             try:
                 await asyncio.sleep(5)
                 await self.check_stops()
                 await asyncio.sleep(5)
             except Exception as e:
                 logger.error(f"Error in stops checking loop: {e}")
+
