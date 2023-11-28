@@ -57,6 +57,7 @@ class BybitGate:
         result = {}
         for position in positions:
             pnl = position.get("unrealizedPnl", 0)
+            pnl = pnl if pnl is not None else 0
             result[position["symbol"]] = {
                 "symbol": position["symbol"],
                 "contracts": position["contracts"],
