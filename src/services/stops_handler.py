@@ -56,9 +56,9 @@ class StopsHandler:
     async def enter_to_checking_loop(self) -> NoReturn:
         while self.activated:
             try:
-                await asyncio.sleep(5)
+                await asyncio.sleep(0.5)
                 await self.check_stops()
-                await asyncio.sleep(5)
+                await asyncio.sleep(0.5)
             except Exception as e:
                 logger.error(f"Error in stops checking loop: {e}")
 
