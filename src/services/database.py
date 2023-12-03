@@ -11,6 +11,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import sessionmaker
 
 from src.models.base import Base
+from src.models.selected_exchange import SelectedExchange
 from src.models.user_api_key import UserApiKey
 from src.models.position_couple import PositionCouple, CoupleWithTickers
 from src.models.user_ticker import UserTicker
@@ -38,7 +39,7 @@ class DBFacade(object):
         """
         return self._session()
 
-    def set_user_api_keys(self, tg_user_id, public_key, private_key):
+    def set_user_api_keys(self, tg_user_id: int, exchange: str, public_key: str, private_key: str):
         """
         Add new remind entry into table
         :return:
@@ -46,22 +47,35 @@ class DBFacade(object):
         with self.get_session() as session:
             user_api_key = UserApiKey(
                 tg_user_id=tg_user_id,
+                exchange=exchange,
                 public_key=public_key,
                 private_key=private_key
             )
             values = session.query(UserApiKey) \
-                .filter_by(tg_user_id=tg_user_id) \
+                .filter_by(tg_user_id=tg_user_id, exchange=exchange) \
                 .all()
             if len(values) > 0:
                 session.query(UserApiKey) \
-                    .filter_by(tg_user_id=tg_user_id) \
+                    .filter_by(tg_user_id=tg_user_id, exchange=exchange) \
                     .update({"public_key": public_key,
                              "private_key": private_key})
             else:
                 session.add(user_api_key)
             session.commit()
 
-    def get_user_keys(self, tg_user_id: int) -> list[UserApiKey]:
+    def get_user_keys_for_exchange(self, tg_user_id: int, exchange: str) -> list[UserApiKey]:
+        """
+        Fetch all reminders for user
+        :param tg_user_id: telegram user id
+        :param exchange: name of exchange
+        :return: list of reminders)
+        """
+        with self.get_session() as session:
+            return session.query(UserApiKey) \
+                .filter_by(tg_user_id=tg_user_id, exchange=exchange) \
+                .all()
+
+    def get_all_user_keys(self, tg_user_id: int) -> list[UserApiKey]:
         """
         Fetch all reminders for user
         :param tg_user_id: telegram user id
@@ -94,6 +108,7 @@ class DBFacade(object):
                 result[couple.tg_user_id][couple.id] = CoupleWithTickers(
                     couple_id=couple.id,
                     tg_user_id=couple.tg_user_id,
+                    exchange=couple.exchange,
                     roi_stop_value=couple.roi_stop_value,
                     check_profit=couple.check_profit,
                     tickers=[]
@@ -119,6 +134,7 @@ class DBFacade(object):
                 result[couple.id] = CoupleWithTickers(
                     couple_id=couple.id,
                     tg_user_id=tg_user_id,
+                    exchange=couple.exchange,
                     roi_stop_value=couple.roi_stop_value,
                     check_profit=couple.check_profit,
                     tickers=[]
@@ -144,6 +160,7 @@ class DBFacade(object):
             result = CoupleWithTickers(
                 couple_id=couple_id,
                 tg_user_id=tg_user_id,
+                exchange=couple.exchange,
                 roi_stop_value=couple.roi_stop_value,
                 check_profit=couple.check_profit,
                 tickers=[ticker.ticker for ticker in tickers]
@@ -168,10 +185,11 @@ class DBFacade(object):
 
         return removed_couples, removed_tickers
 
-    def add_couple(self, tg_user_id: int, tickers: list[str], roi_stop_value: float, check_profit: bool):
+    def add_couple(self, tg_user_id: int, exchange: str, tickers: list[str], roi_stop_value: float, check_profit: bool):
         with self.get_session() as session:
             couple = PositionCouple(
                 tg_user_id=tg_user_id,
+                exchange=exchange,
                 roi_stop_value=roi_stop_value,
                 check_profit=check_profit
             )
@@ -181,6 +199,7 @@ class DBFacade(object):
             for ticker in tickers:
                 session.add(UserTicker(
                     couple_id=couple.id,
+                    exchange=exchange,
                     ticker=ticker,
                     tg_user_id=tg_user_id
                 ))
@@ -208,3 +227,37 @@ class DBFacade(object):
                     .filter_by(id=couple_id) \
                     .delete()
                 session.commit()
+
+    def get_exchanges(self, tg_user_id: int):
+        keys = self.get_all_user_keys(tg_user_id=tg_user_id)
+        result = []
+        for key_pair in keys:
+            result.append(key_pair.exchange)
+        return result
+
+    def set_selected_exchange(self, tg_user_id: int, exchange: str):
+        with self.get_session() as session:
+            user_selected_exchange = SelectedExchange(
+                tg_user_id=tg_user_id,
+                exchange=exchange
+            )
+            values = session.query(SelectedExchange) \
+                .filter_by(tg_user_id=tg_user_id) \
+                .all()
+            if len(values) > 0:
+                session.query(SelectedExchange) \
+                    .filter_by(tg_user_id=tg_user_id) \
+                    .update({"exchange": exchange})
+            else:
+                session.add(user_selected_exchange)
+            session.commit()
+
+    def get_selected_exchange(self, tg_user_id: int) -> Optional[SelectedExchange]:
+
+        with self.get_session() as session:
+            result = session.query(SelectedExchange) \
+                .filter_by(tg_user_id=tg_user_id) \
+                .all()
+        if len(result) == 0:
+            return None
+        return result[0]

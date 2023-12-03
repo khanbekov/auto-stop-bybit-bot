@@ -16,12 +16,13 @@ class UserTicker(Base):
     __tablename__ = 'UserTicker'
     id = Column(Integer, primary_key=True, autoincrement=True)
     tg_user_id = Column(BigInteger)
+    exchange = Column(String)
     ticker = Column(String)
     couple_id = Column(Integer, ForeignKey("PositionCouple.id"), nullable=True)
 
     # couple = relationship('PositionCouple', foreign_keys='UserTicker.couple_id')
 
     def __repr__(self):
-        return "<UserTicker(id='{}', tg_user_id='{}', ticker={}, couple_id={})>" \
-            .format(self.id, self.tg_user_id, self.ticker, self.couple_id)
+        return "<UserTicker(id='{}', tg_user_id='{}', exchange='{}', ticker={}, couple_id={})>" \
+            .format(self.id, self.tg_user_id, self.exchange, self.ticker, self.couple_id)
 

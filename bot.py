@@ -7,10 +7,11 @@ from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand
 
 from config import Config, load_config
-from src.handlers.bybit_interaction import BybitInteraction
+from src.handlers.exchange_interaction import ExchangeInteraction
 from src.handlers.couples_management import CouplesManagement
+from src.handlers.general import GeneralHandlers
 from src.handlers.set_api_keys import SetKeysHandler
-from src.services.bybit_gate import BybitGate
+from src.services.exchange_gate import ExchangeGate
 from src.services.database import DBFacade
 from src.services.stops_handler import StopsHandler
 
@@ -35,15 +36,17 @@ async def main():
 
     db.clear_empty_couples()
 
-    exc = BybitGate(db.get_all_keys())
+    exc = ExchangeGate(db.get_all_keys())
 
     keys_handle = SetKeysHandler(db=db, bot=bot, dispatcher=dp, exchange_gate=exc)
-    exc_handle = BybitInteraction(db=db, bot=bot, dispatcher=dp, exchange_gate=exc)
+    exc_handle = ExchangeInteraction(db=db, bot=bot, dispatcher=dp, exchange_gate=exc)
     couples_management = CouplesManagement(db=db, bot=bot, dispatcher=dp, exchange_gate=exc)
+    general_handlers = GeneralHandlers(bot=bot, dispatcher=dp)
 
     dp.include_router(keys_handle.router)
     dp.include_router(exc_handle.router)
     dp.include_router(couples_management.router)
+    dp.include_router(general_handlers.router)
 
     stops_handler = StopsHandler(db=db, bot=bot, dispatcher=dp, exchange_gate=exc)
 
@@ -92,6 +95,7 @@ async def setup_bot_commands(bot: Bot) -> None:
         BotCommand(command="/remove", description="Удалить стоп. Использование /remove <id>"),
         BotCommand(command="/change", description="Изменить стоп. Использование /change <id>"
                                                   " <новый стоп ROI в процентах>"),
+        BotCommand(command="/exc", description="Текущая биржа. Использование /exc <название>, либо просто /exc"),
     ]
     await bot.set_my_commands(bot_commands)
 
