@@ -37,7 +37,7 @@ class CouplesManagement:
 
             exchange = self.db.get_selected_exchange(message.from_user.id)
             if exchange is None:
-                await message.reply(text="Не выбрана текущая биржа. Пожалуйста, укажите её `/exchange <название>`")
+                await message.reply(text="Не выбрана текущая биржа. Пожалуйста, укажите её `/exchange &lt;название&gt;`")
                 return
 
             pattern = r'^\w{1,}$'

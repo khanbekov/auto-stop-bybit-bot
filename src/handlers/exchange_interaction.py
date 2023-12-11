@@ -33,7 +33,7 @@ class ExchangeInteraction:
 
             selected_exchange = self.db.get_selected_exchange(message.from_user.id)
             if selected_exchange is None:
-                await message.reply(text="Не выбрана текущая биржа. Пожалуйста, укажите её `/exchange <название>`")
+                await message.reply(text="Не выбрана текущая биржа. Пожалуйста, укажите её `/exchange &lt;название&gt;`")
                 return
 
             result = self.db.get_user_keys_for_exchange(tg_user_id=message.from_user.id,
@@ -62,7 +62,7 @@ class ExchangeInteraction:
         try:
             selected_exchange = self.db.get_selected_exchange(message.from_user.id)
             if selected_exchange is None:
-                await message.reply(text="Не выбрана текущая биржа. Пожалуйста, укажите её `/exchange <название>`")
+                await message.reply(text="Не выбрана текущая биржа. Пожалуйста, укажите её `/exchange &lt;название&gt;`")
                 return
 
             positions = self.exc_gate.get_current_positions_as_dict_on_exchange(
