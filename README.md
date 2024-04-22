@@ -63,16 +63,16 @@ To get started with this bot, follow these steps:
 
 - Clone this repository to your local machine.
 
-    ```
-    $ git clone [source]
+    ```console
+    user@server:~$ git clone [source]
     ```
 
 - Create a virtual environment, activate it and install required dependencies.
 
-    ```
-    $ python3.10 -m venv env
-    $ source env/bin/activate
-    $ pip install -r requirements/local.txt
+    ```console
+    user@server:~$ python3.10 -m venv env
+    user@server:~$ source env/bin/activate
+    user@server:~$ pip install -r requirements/local.txt
     ```
 
 - Create a new bot on Telegram by talking to the BotFather, and [obtain the API token](https://www.siteguarding.com/en/how-to-get-telegram-bot-api-token).
@@ -80,4 +80,33 @@ To get started with this bot, follow these steps:
 - Rename the file `.env.dist` to `.env` and replace the placeholders with required data.
 
 - Run the bot using `python bot.py`.
+
+### Optional: create systemd daemon
+- Create service file:
+    ```console
+    user@server:~$ sudo vim /etc/systemd/system/auto-stop-bybit-bot.service
+    ```
+- Fill service file content:
+    ```ini
+    [Unit]
+    Description=Auto Stop ROI Telegram Bot
+    After=network.target
+    
+    [Service]
+    User=user
+    WorkingDirectory=/home/user/auto-stop-bybit-bot
+    ExecStart=/home/user/auto-stop-bybit-bot/venv/bin/python bot.py
+    Restart=always
+    
+    [Install]
+    WantedBy=multi-user.target
+    ```
+- Run service:
+    ```console
+    user@server:~$ sudo systemctl start auto-stop-bybit-bot.service
+    ```
+- You also can check status of service:
+    ```console
+    user@server:~$ sudo systemctl status auto-stop-bybit-bot.service
+    ```
 
