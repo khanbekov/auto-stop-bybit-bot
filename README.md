@@ -2,24 +2,23 @@
 
 ![aiogram](https://img.shields.io/badge/python-v3.10-blue.svg?logo=python&logoColor=yellow) ![aiogram](https://img.shields.io/badge/aiogram-v3-blue.svg?logo=telegram) ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-## About:
-Бот для установки и автоматического контроля стопов по ROI. Основной фишкой бота является установка одного стопа для
+## Описание:
+Бот для установки и автоматического контроля stop ордеров по ROI. Основной фишкой бота является установка одного стопа для
 нескольких позиций. В таком случае, будет проверяться сумма ROI по указанным позициям. Поддерживает как стоп на 
 повышение ROI, так и на понижение ROI. Режим выбирается автоматически, исходя из текущего ROI по позициям 
 (если позиций ещё нет, то считается, что их ROI равен нулю). 
 
-## Features
+## Возможности
 
-The bot provides the following features:
+Бот предоставляет следующие возможности
 
-- Установка стопа по ROI для нескольких позиций, по суммарному ROI
-- Автоматическая проверка позиций на бирже
-- Получение позиций из бирж
+- Установка стопа по ROI для нескольких позиций, по суммарному ROI;
+- Автоматическая проверка позиций на бирже Bybit;
+- Получение позиций из биржи Bybit.
 
-## Commands
+## Команды
 
-The bot has several commands that can be used to access its features:
-
+Бот предоставляет следующие команды для управления:
 
 ### Управление стопами 
 
@@ -49,7 +48,7 @@ The bot has several commands that can be used to access its features:
 
  `/positions` - просмотр текущих позиций на бирже.
 
-## Requirements
+## Зависимости
 
 - Python v3.10
 - aiogram v3.2.0
@@ -57,17 +56,42 @@ The bot has several commands that can be used to access its features:
 - ccxt v4.1.64
 - sqlalchemy v2.0.23
 
-## Installation
+## Установка
+Запуск был протестирован на Linux Ubuntu 24.04. Предполагаю, что это также будет работать на других версиях Ubuntu 
+и других дистрибутивах Linux.
 
-To get started with this bot, follow these steps:
+Чтобы запустить бота, следуйте следующим инструкциям:
 
-- Clone this repository to your local machine.
+### Начало установки
+
+- Склонируйте репозиторий на своём компьютере или сервере.
 
     ```console
-    user@server:~$ git clone [source]
+    user@server:~$ git clone https://github.com/khanbekov/auto-stop-bybit-bot.git
+    user@server:~$ cd auto-stop-bybit-bot
     ```
 
-- Create a virtual environment, activate it and install required dependencies.
+- Создайте нового бота в Telegram через [BotFather](https://t.me/BotFather), и [получите API токен](https://www.siteguarding.com/en/how-to-get-telegram-bot-api-token).
+
+- Переименуйте файл `.env.dist` в `.env` и вставьте в переменную BOT_TOKEN токен бота. Пример:
+
+    ```
+    # Telegram Bot Token
+    BOT_TOKEN="123123123:AAAABBBBCCCCDDDDEEEEFFFFGGGG"
+    ```
+
+### Запуск через Docker Compose
+- Установите Docker сompose, следуя [официальной инструкции](https://docs.docker.com/compose/install/).
+
+- Запустите бота, используя команду:
+
+    ```console
+    user@server:~$ docker-compose up
+    ```
+
+### Запуск из консоли
+
+- Создайте виртуальную среду (virtual env) и установите зависимости.
 
     ```console
     user@server:~$ python3.10 -m venv env
@@ -75,18 +99,20 @@ To get started with this bot, follow these steps:
     user@server:~$ pip install -r requirements/local.txt
     ```
 
-- Create a new bot on Telegram by talking to the BotFather, and [obtain the API token](https://www.siteguarding.com/en/how-to-get-telegram-bot-api-token).
+- Запустите бота, используя:
 
-- Rename the file `.env.dist` to `.env` and replace the placeholders with required data.
+    ```console
+    user@server:~$ python bot.py
+    ```
 
-- Run the bot using `python bot.py`.
-
-### Optional: create systemd daemon
-- Create service file:
+### Создание сервиса Systemd
+- Создайте файл сервиса:
     ```console
     user@server:~$ sudo vim /etc/systemd/system/auto-stop-bybit-bot.service
     ```
-- Fill service file content:
+- Заполните файл 
+(**Внимание**: вам нужно прописать актуальный путь к файлам в переменных 
+**WorkingDirectory** и **ExecStart**):
     ```ini
     [Unit]
     Description=Auto Stop ROI Telegram Bot
@@ -101,12 +127,22 @@ To get started with this bot, follow these steps:
     [Install]
     WantedBy=multi-user.target
     ```
-- Run service:
+- Запустите сервис:
     ```console
     user@server:~$ sudo systemctl start auto-stop-bybit-bot.service
     ```
-- You also can check status of service:
+#### Подсказка: полезные команды systemctl и journalctl
+
+- Также вы можете проверить состояние работы сервиса:
     ```console
     user@server:~$ sudo systemctl status auto-stop-bybit-bot.service
+    ```
+- Чтение логов сервиса:
+    ```console
+    user@server:~$ sudo journalctl -eu auto-stop-bybit-bot.service
+    ```
+- Остановка сервиса:
+    ```console
+    user@server:~$ sudo systemctl stop auto-stop-bybit-bot.service
     ```
 
