@@ -44,11 +44,6 @@ class GeneralHandlers:
 '''
             await self.bot.send_message(message.from_user.id,
                                         help_message, parse_mode=ParseMode.HTML)
-            await self.bot.send_message(
-                message.from_user.id,
-                "",
-                parse_mode=ParseMode.HTML, reply_markup=main_markup
-            )
 
         except Exception as e:
             logger.warning(f"Error on start_message() {e}", exc_info=True)
