@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   bot-app:
+    container_name: auto_stop_bybit_bot
     build:
       context: .
       dockerfile: Dockerfile
